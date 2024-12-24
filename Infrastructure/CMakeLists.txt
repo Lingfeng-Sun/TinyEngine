@@ -2,16 +2,20 @@ message(STATUS "Configuring Infrastructure...")
 
 
 Set(Infra_H
-./include/GlobalSingleton.h
+./include/TinyCommon.h
+./include/ContainerDefine.h
+./include/CommanMacroDef.h
+./include/TinyAssert.h
+./include/ReferenceCountObject.h
+./include/TinyNewDelete.h
 )
 
 Set(Infra_S
-./src/GlobalSingleton.cpp
+./src/Infrastructure.cpp
 )
 
 
-
-add_library(TinyInfra SHARED 
+add_library(TinyInfra STATIC 
 ${Infra_H}
 ${Infra_S}
 )
@@ -22,7 +26,11 @@ set_target_warnning(TinyInfra)
 #target_compile_definitions(TinyInfra PUBLIC HOYOAI_BUILD_DYNAMIC_LIB)
 target_compile_definitions(TinyInfra PRIVATE "TinyInfra_EXPORTS")
 
-list(APPEND Infra_LinkLib
+target_include_directories(TinyInfra PUBLIC 
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
+
+list(APPEND Infra_LinkLib
+)
 target_link_libraries(TinyInfra ${Infra_LinkLib})

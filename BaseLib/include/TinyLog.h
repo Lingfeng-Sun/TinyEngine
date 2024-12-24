@@ -1,16 +1,14 @@
-//HoYoAi
-//miHoYo Co., Ltd  All rights reserved
-//Created by Haitian.lin  2023/6/6
-
 #pragma once
-#include "BaseLibExport.h"
+
 #include <cstdint>
 #include <atomic>
 #include <stdarg.h>
-namespace HoYoAi
+#include "Global.h"
+
+namespace ty
 {
 
-enum LogLevel
+enum LogLevel : uint8_t
 {
     LogLevel_Default,
     LogLevel_Debug,
@@ -19,32 +17,32 @@ enum LogLevel
     LogLevel_Error,
 };
 
-class AiBaseLibAPI AiLog
+class TyLog : public SingletonObject
 {
 public:
     //todo: implement log....
     template<typename... Args>
     static void Log(LogLevel logLevel, const char* format, Args... args)
     {
-        LogVar(logLevel, format, args...);
+        Instance()->LogVar(logLevel, format, args...);
     }
 
     template<typename... Args>
     static void LogInfo(const char* format, Args... args)
     {
-        LogVar(LogLevel_Info, format, args...);
+        Instance()->LogVar(LogLevel_Info, format, args...);
     }
 
     template<typename... Args>
     static void LogWarning(const char* format, Args... args)
     {
-        LogVar(LogLevel_Warning, format, args...);
+        Instance()->LogVar(LogLevel_Warning, format, args...);
     }
 
     template<typename... Args>
     static void LogError(const char* format, Args... args)
     {
-        LogVar(LogLevel_Error, format, args...);
+        Instance()->LogVar(LogLevel_Error, format, args...);
     }
 
     static void Log(LogLevel logLevel, const char* str);
@@ -52,19 +50,19 @@ public:
 	typedef void (*LogFunction)(uint32_t logLevel, const char* str);
 
 	static void SetExternalLogFunction(LogFunction logFunc);
-	
-    static void CheckColorSupport();
 
-    static void EnableConsoleColorSupport();
+    
+
+    virtual void Release() override;
 
 private:
-    static void LogVar(LogLevel logLevel, const char* format, ...);
+    void LogVar(LogLevel logLevel, const char* format, ...);
 
-	static LogFunction sExteranlLogFunc;
-    static uint8_t sLoggineLevel;
-    static int8_t sColorFlag; 
-    static std::atomic<uint64_t> sWriteFlag;
-    static const char* sDebugColor[5];
+    static TyLog* Instance();
+
+    LogFunction mExteranlLogFunc{ nullptr };
+    int8_t mLoggineLevel{ LogLevel_Debug };
+    std::atomic<uint64_t> mWriteFlag{ 0 };
 };
 
 }

@@ -33,16 +33,27 @@ function(set_target_warnning targetName)
 endfunction()
 
 
+function(enable_unity_build TARGET) 
+	get_target_property(SRCS ${TARGET} SOURCES) 
+	set(UNITY_SOURCE_FILE ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_unity_build.cpp) 
+	file(WRITE ${UNITY_SOURCE_FILE} "// Unity Build file for ${TARGET}\n") 
+	
+	foreach(SRC ${SRCS}) 
+		file(APPEND ${UNITY_SOURCE_FILE} "#include \"${SRC}\"\n") 
+	endforeach() 
+
+	set_source_files_properties(${UNITY_SOURCE_FILE} PROPERTIES GENERATED TRUE) 
+	target_sources(${TARGET} PRIVATE ${UNITY_SOURCE_FILE}) 
+endfunction()
+
+
 
 set(CMAKE_LIBRARY_ARCHITECTURE x86_64)
 
 option(TINY_SHIPPING "Enable for final public release build" OFF)
 
 
-
 set(compiler_folder_name "")
-
-
 if(WIN32)
 	if(MSVC_TOOLSET_VERSION STREQUAL "143")
 		set(compiler_folder_name "vs2022")
@@ -77,4 +88,11 @@ endif()
 
 
 add_subdirectory(Infrastructure)
+add_subdirectory(Global)
 add_subdirectory(BaseLib)
+
+
+
+if(WIN32)
+	add_subdirectory(TestConsole)
+endif()
